@@ -45,6 +45,16 @@ uint64 sys_wait(void) {
    }
 
 
+uint64 sys_waitall(void) {
+    uint64 n;          
+    uint64 statuses;  // Pointer to the statuses array 
+
+    argaddr(0, &n);
+    argaddr(1, &statuses);
+    return  waitall(n , statuses );  // Wait for child process
+
+   }
+
 
 uint64
 sys_sbrk(void)
@@ -108,3 +118,6 @@ uint64 sys_memsize(void)
   struct proc *p = myproc();
   return p->sz; // Process size in bytes
 }
+
+
+

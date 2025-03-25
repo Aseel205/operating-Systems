@@ -135,6 +135,9 @@ UPROGS=\
 	$U/_helloworld\
 	$U/_memsize_test\
 	$U/_goodbye\
+	$U/_bigarray\
+
+
 
 
 

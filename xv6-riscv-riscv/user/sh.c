@@ -187,11 +187,13 @@ while (getcmd(buf, sizeof(buf)) >= 0)
         runcmd(parsecmd(buf));
 
     char exit_msg[32];  // Initialize exit message buffer
-    int ret_pid = wait( 0 , exit_msg);  // Pass address of exit_msg to store exit message
+    wait( 0 , exit_msg);  // Pass address of exit_msg to store exit message
+
+    // int ret_pid = wait( 0 , exit_msg);  // Pass address of exit_msg to store exit message
 
     // Ensure that exit_msg contains a string, even if it's less than 32 chars
     exit_msg[31] = '\0';  // Null-terminate to avoid printing uninitialized data
-    printf("Process %d exited with message: %s\n", ret_pid, exit_msg);
+ //   printf("Process %d exited with message: %s\n", ret_pid, exit_msg);
 }
 
 exit(0, " ");

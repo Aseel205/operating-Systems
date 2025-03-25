@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "stdbool.h"
 
 struct cpu cpus[NCPU];
 
@@ -412,9 +413,9 @@ wait(uint64 addr  , uint64  messagePointerAddress )
                                   sizeof(pp->xstate)) < 0) {
             release(&pp->lock);
             release(&wait_lock);
-            return -1;
+            return -1;       
           }
-          printf ("(kernel)  pp->exit_msg :  %s" , pp->exit_msg ) ; 
+      //    printf ("(kernel)  pp->exit_msg :  %s" , pp->exit_msg ) ; 
           copyout(myproc()->pagetable, messagePointerAddress, pp->exit_msg, 32);
 
           freeproc(pp);
@@ -436,6 +437,85 @@ wait(uint64 addr  , uint64  messagePointerAddress )
   }
 
 }
+
+int waitall(uint64 childsAddress, uint64 childsStauts) { 
+  struct proc *pp;
+  int pid;
+  struct proc *p = myproc();
+
+  int i = 0;
+  int childsCounter = 0;
+  bool childAreZombies = false;  
+
+  acquire(&wait_lock); // ✅ Lock once at the start
+
+  while (!childAreZombies) {
+    int number_of_kids = 0; 
+    int number_of_zombies = 0;
+
+    // Scan for all child processes
+    for (pp = proc; pp < &proc[NPROC]; pp++) {
+      if (pp->parent == p) {
+        number_of_kids++;
+        if (pp->state == ZOMBIE) {
+          number_of_zombies++;
+        }
+      }
+    }
+
+    childAreZombies = (number_of_kids == number_of_zombies);
+
+    if (!childAreZombies) {
+      sleep(p, &wait_lock); // ✅ Avoid busy waiting
+    }
+  }
+
+  // Process zombie children
+  for (pp = proc; pp < &proc[NPROC]; pp++) {
+    if (pp->parent == p && pp->state == ZOMBIE) {
+      acquire(&pp->lock);
+
+      pid = pp->pid;
+
+      // Copy status to user space
+      if (childsStauts != 0 &&
+          copyout(p->pagetable, childsStauts + i * sizeof(int), 
+                  (char *)&pid, sizeof(int)) < 0) {
+        release(&pp->lock);
+        release(&wait_lock);
+        return -1;
+      }
+
+      i++;
+      childsCounter++;
+
+      freeproc(pp);
+      release(&pp->lock);
+    }
+  }
+
+  printf("(debug) childsCounter: %d\n", childsCounter);
+
+  // If no children or process is killed, return
+  if (!childsCounter || killed(p)) {
+    release(&wait_lock);
+    copyout(p->pagetable, childsAddress, (char *)&childsCounter, sizeof(int));
+    return -1;
+  }
+
+  // Store child count after processing zombies
+  if (copyout(p->pagetable, childsAddress, (char *)&childsCounter, sizeof(int)) < 0) {
+    release(&wait_lock);
+    return 0;
+  }
+
+  release(&wait_lock); // ✅ Ensure the lock is released before returning
+
+  return 0; 
+}
+
+
+
 
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.

@@ -6,6 +6,7 @@
         "proc.h": "c",
         "user.h": "c",
         "syscall.h": "c",
-        "spinlock.h": "c"
+        "spinlock.h": "c",
+        "stat.h": "c"
     },
 }
