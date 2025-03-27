@@ -24,6 +24,7 @@ int sleep(int);
 int uptime(void);
 int memsize(void);
 int waitall(int* n, int* statuses);
+int forkn(int n, int* pids);
 
 
 // ulib.c

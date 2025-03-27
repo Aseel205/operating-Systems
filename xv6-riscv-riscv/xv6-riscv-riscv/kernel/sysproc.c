@@ -33,6 +33,27 @@ sys_fork(void)
   return fork();
 }
 
+
+uint64 sys_forkn(void)
+{
+    int n;
+    uint64 pids ;  
+    argint(0, &n);
+    argaddr(1,  &pids);  // Get the user-space address for pids
+    
+    if(n < 1 || n > 16) {
+        return -1;  // Invalid number of children
+    }
+
+    // Check if the pids pointer is valid and accessible in user space
+    if (pids == 0) {
+        return -1;  // Invalid address
+    }
+
+    return forkn(n, (int*) pids);  // Call the forkn function with the arguments
+}
+
+
 uint64 sys_wait(void) {
     uint64 p;
     uint64 messagePointerAddress;  // Pointer to user-space buffer
@@ -118,6 +139,5 @@ uint64 sys_memsize(void)
   struct proc *p = myproc();
   return p->sz; // Process size in bytes
 }
-
 
 

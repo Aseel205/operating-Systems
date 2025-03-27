@@ -22,6 +22,8 @@
 #define SYS_close  21
 #define SYS_memsize  22
 #define SYS_waitall  23
+#define SYS_forkn  24
+
 
 
 

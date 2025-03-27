@@ -326,6 +326,73 @@ fork(void)
   return pid;
 }
 
+int forkn(int n, int *pids) {
+    int i, pid;
+    struct proc *np;
+    struct proc *p = myproc();
+    char aseelLock [1] ; 
+
+    acquire(&wait_lock); // Ensure parent holds the lock before creating children
+
+    for (int j = 0; j < n; j++) {
+        // Allocate process
+        np = allocproc();
+        if (!np) {
+            printf("forkn: allocproc() failed at j=%d\n", j);
+            release(&wait_lock); // Release before returning
+            return -1;
+        }
+
+        // Copy user memory
+        if (uvmcopy(p->pagetable, np->pagetable, p->sz) < 0) {
+            freeproc(np);
+            release(&np->lock);
+            release(&wait_lock); // Ensure lock is released
+            return -1;
+        }
+        np->sz = p->sz;
+
+        // Copy registers
+        *(np->trapframe) = *(p->trapframe);
+        np->trapframe->a0 = j + 1; // Set child index in fork operation
+
+        // Copy file descriptors
+        for (i = 0; i < NOFILE; i++) {
+            if (p->ofile[i]) {
+                np->ofile[i] = filedup(p->ofile[i]);
+            }
+        }
+
+        np->cwd = idup(p->cwd);
+        safestrcpy(np->name, p->name, sizeof(p->name));
+
+        pid = np->pid;
+
+        // Set parent process
+        np->parent = p;
+
+        // Copy PID to user-space array
+        copyout(p->pagetable, (uint64)(&pids[j]), (char *)&pid, sizeof(int));
+
+        // Put process to sleep before making it runnable
+        np->chan = aseelLock;
+        np->state = SLEEPING;
+
+        release(&np->lock); // Release before sleeping
+      //  printf ("trap0");
+    }
+
+    // Now wake up all children
+    wakeup(aseelLock); // Wake up all processes sleeping on the parent
+
+    release(&wait_lock); // Parent releases wait_lock before returning
+    return 0;
+}
+
+
+
+
+
 // Pass p's abandoned children to init.
 // Caller must hold wait_lock.
 void

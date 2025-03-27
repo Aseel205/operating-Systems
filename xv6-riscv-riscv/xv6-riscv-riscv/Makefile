@@ -136,11 +136,7 @@ UPROGS=\
 	$U/_memsize_test\
 	$U/_goodbye\
 	$U/_bigarray\
-
-
-
-
-
+	$U/_bsbs\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)

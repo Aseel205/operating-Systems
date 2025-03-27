@@ -7,9 +7,6 @@
 
 #define N  1000
 
-char exit_msg[32]; // Buffer to hold the exit message
-
-
 void
 print(const char *s)
 {
@@ -36,14 +33,15 @@ forktest(void)
     exit(1 , " ");
   }
 
-  for(; n > 0; n--){
-    if(wait(0 , exit_msg) < 0){
+  char buffer [32] ; 
+   for(; n > 0; n--){
+    if(wait(0 , buffer) < 0){
       print("wait stopped early\n");
       exit(1 , " ");
     }
   }
 
-  if(wait(0 , exit_msg) != -1){
+  if(wait(0 ,buffer) != -1){
     print("wait got too many\n");
     exit(1 , " ");
   }
@@ -55,5 +53,5 @@ int
 main(void)
 {
   forktest();
-  exit(0 , "222 ");
+  exit(0, " ");
 }

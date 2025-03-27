@@ -2,7 +2,7 @@
 #include "kernel/stat.h"
 #include "user/user.h"
 
-int main() {
+int waitnTest () {    
     int numChildren = 5;  // Increase number of child processes
     int pids[numChildren];
 
@@ -34,3 +34,8 @@ int main() {
     printf("\nAll children have exited.\n");
     exit(0, " ");
 }
+
+int main () {
+    return  0 ; 
+}
+ 
