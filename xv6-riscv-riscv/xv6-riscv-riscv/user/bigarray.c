@@ -14,7 +14,7 @@ void task4(int n) {
 
     int pids[n];  // Array to store PIDs
 
-    // Initialize array with consecutive numbers
+    // Parent process: initialize the array with consecutive numbers
     for (int i = 0; i < ARRAY_SIZE; i++) {
         arr[i] = i;
     }
@@ -63,7 +63,7 @@ void task4(int n) {
 }
 
 int main() {
-    int n = 7 ;
+    int n = 5 ;
     task4(n); // Call task4 with the specified number of child processes
 
     printf("\n===== All tests finished! =====\n");
