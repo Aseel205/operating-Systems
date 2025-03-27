@@ -33,13 +33,13 @@ void test_forkn(int n) {
 
 int main() {
     printf("===== Testing forkn =====\n");
-/*
+
     printf("\nTest 1: Creating 4 child processes\n");
     test_forkn(4);
-*/
+
     printf("\nTest 2: Creating 16 child processes (max limit)\n");
     test_forkn(16);
-/*
+
     printf("\nTest 3: Invalid n (-1)\n");
     test_forkn(-1);
 
@@ -48,7 +48,8 @@ int main() {
 
     printf("\nTest 5: Invalid n (17, beyond max limit)\n");
     test_forkn(17);
-*/
+    
+
     printf("\n===== All tests finished! =====\n");
     exit(0 , " ");
 }

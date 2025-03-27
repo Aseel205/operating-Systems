@@ -331,9 +331,7 @@ int forkn(int n, int *pids) {
     struct proc *np;
     struct proc *p = myproc();
     char aseelLock [1] ; 
-
     acquire(&wait_lock); // Ensure parent holds the lock before creating children
-
     for (int j = 0; j < n; j++) {
         // Allocate process
         np = allocproc();
@@ -351,35 +349,31 @@ int forkn(int n, int *pids) {
             return -1;
         }
         np->sz = p->sz;
-
         // Copy registers
         *(np->trapframe) = *(p->trapframe);
-        np->trapframe->a0 = j + 1; // Set child index in fork operation
-
+        np->trapframe->a0 = j+1 ; // Set child index in fork operation
+    
         // Copy file descriptors
         for (i = 0; i < NOFILE; i++) {
             if (p->ofile[i]) {
                 np->ofile[i] = filedup(p->ofile[i]);
             }
         }
-
         np->cwd = idup(p->cwd);
         safestrcpy(np->name, p->name, sizeof(p->name));
 
         pid = np->pid;
-
         // Set parent process
         np->parent = p;
 
         // Copy PID to user-space array
         copyout(p->pagetable, (uint64)(&pids[j]), (char *)&pid, sizeof(int));
-
+      
         // Put process to sleep before making it runnable
         np->chan = aseelLock;
         np->state = SLEEPING;
 
         release(&np->lock); // Release before sleeping
-      //  printf ("trap0");
     }
 
     // Now wake up all children
@@ -547,7 +541,7 @@ int waitall(uint64 childsAddress, uint64 childsStauts) {
       // Copy status to user space
       if (childsStauts != 0 &&
           copyout(p->pagetable, childsStauts + i * sizeof(int), 
-                  (char *)&pid, sizeof(int)) < 0) {
+                 (char *)&pp->xstate, sizeof(pp->xstate)) < 0) {
         release(&pp->lock);
         release(&wait_lock);
         return -1;
