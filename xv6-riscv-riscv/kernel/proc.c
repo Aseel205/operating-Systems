@@ -501,7 +501,6 @@ wait(uint64 addr  , uint64  messagePointerAddress )
 
 int waitall(uint64 childsAddress, uint64 childsStauts) { 
   struct proc *pp;
-  int pid;
   struct proc *p = myproc();
 
   int i = 0;
@@ -536,7 +535,6 @@ int waitall(uint64 childsAddress, uint64 childsStauts) {
     if (pp->parent == p && pp->state == ZOMBIE) {
       acquire(&pp->lock);
 
-      pid = pp->pid;
 
       // Copy status to user space
       if (childsStauts != 0 &&

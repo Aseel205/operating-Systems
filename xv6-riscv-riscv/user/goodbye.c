@@ -3,6 +3,6 @@
 #include "user/user.h"
 
 int main() {
-    exit(1 ,"GoodbyeWorldxv6");
+    exit(1 ,"Goodbye World xv6");
     return  0; 
 }
