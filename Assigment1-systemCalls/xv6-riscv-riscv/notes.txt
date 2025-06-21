@@ -1,0 +1,6 @@
+helloworld
+memsize_test
+goodbye
+waitnTest  
+forkntest   
+bigarray
